@@ -1,0 +1,76 @@
+#visualize data
+import pandas as pd
+import matplotlib.pyplot as plt
+import datetime
+import matplotlib.dates as mdates
+from datetime import datetime
+from IPython.display import display
+def visualize_result_multiplication():
+    
+    #Read CSV with math training statistics
+    result = pd.read_csv("result_multiplication.csv")
+    
+    #Er hat aus dem CSV nicht auf dem Schirm, dass es sich um TimeObjects handeln soll. Das macht er nun
+    result['Start_t'] =pd.to_datetime(result.Start_t)
+    result['t_req'] =pd.to_timedelta(result.t_req)
+    
+      
+    #Prepare formatetted date and time colums for plotting    
+    #https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DatetimeIndex.html
+    result['hour'] = pd.DatetimeIndex(result['Start_t']).hour
+    result['Date_short'] =pd.DatetimeIndex(result['Start_t']).date
+    result['t_req_sec'] = result['t_req'].dt.total_seconds()
+        
+    #Calulate Performance Parameters
+    result["Percent"] = (result["Correct_Ans"]/result["Exerc"]*100)
+    result["Hardness"] = (result["Prim"]*result["Sec"])
+    result["corr_per_sec"] = (result["Correct_Ans"]/result["t_req_sec"])
+    
+    
+    display (result)
+   
+    #Hex Bin Plot shows how my percentage of correct answers
+    #The df.plot() function returns a matplotlib.axes.AxesSubplot object. You can set the labels on that object.
+    
+    pig, axes = plt.subplots(nrows=1, ncols=2)
+    ax1 = result.plot.hexbin(x='Hardness', y='Percent', gridsize=10, sharex=False, ax=axes[0])
+    ax2 = result.plot.hexbin(x='Hardness', y='corr_per_sec', gridsize=10, sharex=False, ax=axes[1])
+    ax2.set_ylabel('Correct answers per second') 
+    plt.subplots_adjust(top=0.95, bottom=0.15, left=0.05, right=0.95, hspace=0.1,
+                    wspace=0.1)
+    mng1 = plt.get_current_fig_manager()
+    mng1.full_screen_toggle()
+    
+    
+        
+    fig = plt.figure()    
+    ax3 = fig.add_subplot(121)
+    ax3.set_xlabel('Date')
+    ax3.set_ylabel('Correct answers per second')
+    plt.xticks(rotation=45)
+    #plt.gcf().autofmt_xdate()
+    myFmt = mdates.DateFormatter('%d.%m.')
+    plt.gca().xaxis.set_major_formatter(myFmt)
+    ax3.plot_date(result.Start_t, result["corr_per_sec"], xdate=True, ydate=False, color='skyblue')
+
+    ax4 = fig.add_subplot(122)
+    ax4.set_xlabel('Hour of the day')
+    ax4.set_ylabel('Correct answers per second') 
+    ax4.plot_date(result["hour"], result["corr_per_sec"], xdate=False, ydate=False, color='skyblue')
+    plt.subplots_adjust(top=.95, bottom=0.15, left=0.05, right=0.95, hspace=0.1,
+                    wspace=0.1)
+    
+    mng = plt.get_current_fig_manager()
+    mng.full_screen_toggle()
+    plt.show()
+     
+    
+    
+    #selection = result[result.Hardness >= 100]
+    #fine_selection = selection[selection.Exerc >= 10]
+    #finest_selection = fine_selection[fine_selection. ]
+    #fine_selection.plot(x='Exerc', y='Correct_Ans')
+    
+    
+
+visualize_result_multiplication()
