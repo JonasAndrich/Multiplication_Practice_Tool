@@ -1,0 +1,95 @@
+import random
+import csv
+import numpy as np 
+import pandas as pd
+
+
+#y is counter for right answers
+global y
+y=0
+
+# Anzahl der Aufgaben
+global r
+r = input("How many exercises do you want? ")
+r = int(r)
+
+#Range der Aufgaben
+primary = input("In which range should the multipliers be? Primary: ")
+primary =int(primary)+1
+secondary = input("In which range should the multipliers be? Secondary: ")
+secondary = int(secondary)+1
+
+
+
+
+def Grosse_Zahlen_berechnen():
+    a = random.randrange(1,primary)
+    b = random.randrange(1,secondary)
+    print(a,"*", b)
+    z = a*b
+    x = input("Your answer:")
+    x = int(x)
+    print("The solution is "+ str(z) + "!")
+    if x == z:
+        return True
+    else:
+        return False 
+    
+      
+def counter():
+    global y
+    if Grosse_Zahlen_berechnen() == True:
+        y=y+1
+        return y
+    else:
+        return y 
+    
+def printer():
+    #appends to a text file
+        filename = "test_result_multiplication.csv"     
+        f_out = open(filename, 'a')
+        writer_out = csv.writer(f_out, delimiter=',',lineterminator='\r')
+        new_line = [start_time, r, y, primary-1, secondary-1, time_elapsed, mean, std]
+        print(new_line)
+        #Neue Zeile wird in das writer_out object geschrieben
+        writer_out.writerow(new_line)
+        f_out.close()
+        
+
+def practice_set():
+    import datetime
+    from datetime import datetime
+    global start_time
+    global time_elapsed
+    global mean
+    global std
+    start_time = datetime.now()
+    delta_time_array = []
+    for c in range(r):
+        single_start_time = datetime.now()
+        counter()
+        t_ex = datetime.now()- single_start_time
+        delta_time_array = np.append(delta_time_array, t_ex)
+        #print(delta_time_array)
+
+    time_elapsed = datetime.now() - start_time 
+        
+    mean = (np.array(delta_time_array, dtype='timedelta64[ms]')
+       .view('i8')
+       .mean()
+       )
+    
+    std = (np.array(delta_time_array, dtype='timedelta64[ms]')
+           .view('i8')
+           .std()           
+          )  
+    
+            
+    print(mean)
+    print(std)
+    
+    printer()
+    return "You solved " + str(y) +" execises of "  + str(c+1)  + " total in " + str(time_elapsed)+ "!"
+    
+   
+practice_set()
